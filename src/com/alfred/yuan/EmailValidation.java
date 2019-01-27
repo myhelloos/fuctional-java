@@ -1,5 +1,7 @@
-package com.alfred.yuan.function;
+package com.alfred.yuan;
 
+import com.alfred.yuan.function.Function;
+import com.alfred.yuan.function.base.Case;
 import com.alfred.yuan.function.base.Effect;
 import com.alfred.yuan.function.base.Result;
 
@@ -13,17 +15,12 @@ public class EmailValidation {
             "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
     );
 
-    static Function<String, Result<String>> emailChecker = email -> {
-        if (email == null) {
-            return Result.failure("email must not be null");
-        } else if (email.length() == 0) {
-            return Result.failure("email must not be empty");
-        } else if (emailPattern.matcher(email).matches()) {
-            return Result.success(email);
-        } else {
-            return Result.failure("email " + email + " is invalid");
-        }
-    };
+    static Function<String, Result<String>> emailChecker = email -> Case.match(
+            Case.mcase(() -> Result.success(email))
+            , Case.mcase(() -> email == null, () -> Result.failure("email must not be null"))
+            , Case.mcase(() -> email.length() == 0, () -> Result.failure("email must not be empty"))
+            , Case.mcase(() -> !emailPattern.matcher(email).matches(), () -> Result.failure("email " + email + " is invalid."))
+    );
 
     public static void main(String[] args) {
         emailChecker.apply("this.is@my.email").bind(success, failure);
