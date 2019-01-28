@@ -6,11 +6,14 @@ import com.alfred.yuan.function.base.Executable;
 
 import java.util.List;
 
+import static com.alfred.yuan.function.Function.andThenAll;
+import static com.alfred.yuan.function.Function.composeAll;
 import static com.alfred.yuan.utilities.CollectionUtilities.flodLeft;
 import static com.alfred.yuan.utilities.CollectionUtilities.flodRight;
 import static com.alfred.yuan.utilities.CollectionUtilities.forEach;
 import static com.alfred.yuan.utilities.CollectionUtilities.list;
 import static com.alfred.yuan.utilities.CollectionUtilities.map;
+import static com.alfred.yuan.utilities.CollectionUtilities.range;
 import static com.alfred.yuan.utilities.CollectionUtilities.reverse;
 
 public class Main {
@@ -46,5 +49,10 @@ public class Main {
                 , e -> d -> compose.apply(e).apply(() -> printWith2decimals.apply(d))
         );
         program.exec();
+
+
+        Function<Integer, Integer> add = y -> y + 1;
+        System.out.println(composeAll(map(range(0, 10000), x -> y -> x)).apply(0));
+        System.out.println(andThenAll(map(range(0, 10000), x -> y -> x)).apply(0));
     }
 }

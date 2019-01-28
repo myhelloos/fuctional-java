@@ -1,5 +1,9 @@
 package com.alfred.yuan.function;
 
+import com.alfred.yuan.utilities.CollectionUtilities;
+
+import java.util.List;
+
 /**
  * Created by alfred_yuan on 2019-01-27
  */
@@ -23,33 +27,41 @@ public interface Function<T, U> {
         return x -> f.apply(g.apply(x));
     }
 
+    static <T> Function<T, T> composeAll(List<Function<T, T>> list) {
+        return x -> CollectionUtilities.flodLeft(CollectionUtilities.reverse(list), x, a -> b -> b.apply(a));
+    }
+
     static <T, U, V> Function<T, V> andThen(Function<T, U> f,
                                             Function<U, V> g) {
         return x -> g.apply(f.apply(x));
     }
 
+    static <T> Function<T, T> andThenAll(List<Function<T, T>> list) {
+        return x -> CollectionUtilities.flodLeft(list, x, a -> b -> b.apply(a));
+    }
+
     static <T, U, V> Function<Function<T, U>,
-            Function<Function<U, V>,
-                    Function<T, V>>> compose() {
+        Function<Function<U, V>,
+            Function<T, V>>> compose() {
         return x -> y -> y.compose(x);
     }
 
     static <T, U, V> Function<Function<T, U>,
-            Function<Function<V, T>,
-                    Function<V, U>>> andThen() {
+        Function<Function<V, T>,
+            Function<V, U>>> andThen() {
         return x -> y -> y.andThen(x);
     }
 
     static <T, U, V> Function<Function<T, U>,
-            Function<Function<U, V>,
-                    Function<T, V>>> higherAndThen() {
+        Function<Function<U, V>,
+            Function<T, V>>> higherAndThen() {
         return x -> y -> z -> y.apply(x.apply(z));
     }
 
     static <T, U, V> Function<Function<U, V>,
-            Function<Function<T, U>,
-                    Function<T, V>>> higherCompose() {
+        Function<Function<T, U>,
+            Function<T, V>>> higherCompose() {
         return (Function<U, V> x) ->
-                (Function<T, U> y) -> (T z) -> x.apply(y.apply(z));
+            (Function<T, U> y) -> (T z) -> x.apply(y.apply(z));
     }
 }
