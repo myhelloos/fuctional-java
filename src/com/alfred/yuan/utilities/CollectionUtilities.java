@@ -1,5 +1,6 @@
 package com.alfred.yuan.utilities;
 
+import com.alfred.yuan.corecursive.TailCall;
 import com.alfred.yuan.function.Function;
 import com.alfred.yuan.function.base.Effect;
 
@@ -59,43 +60,61 @@ public interface CollectionUtilities {
     }
 
     static <T, U> U flodLeft(
-            List<T> ts
-            , U identity
-            , Function<U, Function<T, U>> accumulator) {
-        U result = identity;
-        for (T t : ts) {
-            result = accumulator.apply(result).apply(t);
-        }
-        return result;
+        List<T> ts
+        , U identity
+        , Function<U, Function<T, U>> accumulator) {
+        return flodLeft_(identity, ts, accumulator).eval();
     }
 
-    static <T, U> U flodRight(
-            List<T> ts
-            , U identity
-            , Function<T, Function<U, U>> accumulator) {
-//        U result = identity;
-//        for (int i = ts.size(); i > 0; --i) {
-//            result = accumulator.apply(ts.get(i -1)).apply(result);
-//        }
-//        return result;
+    private static <T, U> TailCall<U> flodLeft_(
+        U acc,
+        List<T> ts
+        , Function<U, Function<T, U>> accumulator
+    ) {
         return ts.isEmpty()
-                ? identity
-                : accumulator.apply(head(ts)).apply(flodRight(tail(ts), identity, accumulator));
+            ? TailCall.ret(acc)
+            : TailCall.sus(() -> flodLeft_(accumulator.apply(acc).apply(head(ts)), tail(ts), accumulator));
+    }
+
+    /**
+     * <b>when considering using fold-Right, you should do one of the following:</b>
+     * <ol>
+     *     <li>Not care about performance</li>
+     *     <li>Change the function (if possible) and use foldLeft</li>
+     *     <li>Use foldRight only with small lists</li>
+     *     <li>Use an imperative implementation</li>
+     * </ol>
+     */
+    static <T, U> U flodRight(
+        List<T> ts
+        , U identity
+        , Function<T, Function<U, U>> accumulator) {
+        return flodRight_(identity, reverse(ts), accumulator).eval();
+    }
+
+    private static <T, U> TailCall<U> flodRight_(
+        U acc
+        , List<T> ts
+        , Function<T, Function<U, U>> accumulator
+    ) {
+        return ts.isEmpty()
+            ? TailCall.ret(acc)
+            : TailCall.sus(() -> flodRight_(accumulator.apply(head(ts)).apply(acc), tail(ts), accumulator));
     }
 
     static <T> List<T> reverse(List<T> ts) {
         return flodLeft(
-                ts
-                , list()
-                , x -> y -> prepend(y, x)
+            ts
+            , list()
+            , x -> y -> prepend(y, x)
         );
     }
 
     static <T, U> List<U> map(List<T> list, Function<T, U> f) {
         return flodLeft(
-                list
-                , list()
-                , x -> y -> append(x, f.apply(y))
+            list
+            , list()
+            , x -> y -> append(x, f.apply(y))
         );
     }
 
@@ -106,7 +125,13 @@ public interface CollectionUtilities {
     }
 
     static List<Integer> range(int start, int end) {
-        return unflod(start, temp -> temp + 1, temp -> end > temp);
+        return range_(list(), start, end).eval();
+    }
+
+    private static TailCall<List<Integer>> range_(List<Integer> acc, int start, int end) {
+        return start >= end
+            ? TailCall.ret(acc)
+            : TailCall.sus(() -> range_(append(acc, start), start + 1, end));
     }
 
     static <T> List<T> unflod(T seed, Function<T, T> next, Function<T, Boolean> predictor) {
