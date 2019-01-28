@@ -79,10 +79,10 @@ public interface CollectionUtilities {
     /**
      * <b>when considering using fold-Right, you should do one of the following:</b>
      * <ol>
-     *     <li>Not care about performance</li>
-     *     <li>Change the function (if possible) and use foldLeft</li>
-     *     <li>Use foldRight only with small lists</li>
-     *     <li>Use an imperative implementation</li>
+     * <li>Not care about performance</li>
+     * <li>Change the function (if possible) and use foldLeft</li>
+     * <li>Use foldRight only with small lists</li>
+     * <li>Use an imperative implementation</li>
      * </ol>
      */
     static <T, U> U flodRight(
@@ -132,6 +132,16 @@ public interface CollectionUtilities {
         return start >= end
             ? TailCall.ret(acc)
             : TailCall.sus(() -> range_(append(acc, start), start + 1, end));
+    }
+
+    static <T> List<T> iterate(T seed, Function<T, T> next, int limit) {
+        List<T> result = new ArrayList<>();
+        T temp = seed;
+        while (limit-- > 0) {
+            result = append(result, temp);
+            temp = next.apply(temp);
+        }
+        return result;
     }
 
     static <T> List<T> unflod(T seed, Function<T, T> next, Function<T, Boolean> predictor) {
