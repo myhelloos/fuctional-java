@@ -1,8 +1,8 @@
 package example.com.alfred.yuan;
 
+import com.alfred.yuan.base.Tuple;
 import com.alfred.yuan.corecursive.TailCall;
 import com.alfred.yuan.function.Function;
-import com.alfred.yuan.base.Tuple;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -38,8 +38,8 @@ public class CorecursiveExample {
                 = acc1 -> acc2 -> x_ -> x_.equals(BigInteger.ZERO)
                 ? ret(BigInteger.ZERO)
                 : x_.equals(BigInteger.ONE)
-                ? ret(acc1.add(acc2))
-                : sus(() -> this.fib_.apply(acc2).apply(acc1.add(acc2)).apply(x_.subtract(BigInteger.ONE)));
+                    ? ret(acc1.add(acc2))
+                    : sus(() -> this.fib_.apply(acc2).apply(acc1.add(acc2)).apply(x_.subtract(BigInteger.ONE)));
         }
         return new FibHelper().fib_.apply(BigInteger.ONE).apply(BigInteger.ZERO).apply(BigInteger.valueOf(x)).eval();
     };
@@ -50,8 +50,8 @@ public class CorecursiveExample {
                 return x.equals(BigInteger.ZERO)
                     ? ret(acc)
                     : x.equals(BigInteger.ONE)
-                    ? ret(append(acc, acc1.add(acc2)))
-                    : sus(() -> fib_(append(acc, acc1.add(acc2)), acc2, acc1.add(acc2), x.subtract(BigInteger.ONE)));
+                        ? ret(append(acc, acc1.add(acc2)))
+                        : sus(() -> fib_(append(acc, acc1.add(acc2)), acc2, acc1.add(acc2), x.subtract(BigInteger.ONE)));
             }
         }
         List<BigInteger> list = new FibStrHelper().fib_(
@@ -76,8 +76,8 @@ public class CorecursiveExample {
         return list.isEmpty()
             ? ""
             : tail(list).isEmpty()
-            ? head(list).toString()
-            : head(list) + flodLeft(tail(list), "", x -> y -> x + separator + y);
+                ? head(list).toString()
+                : head(list) + flodLeft(tail(list), "", x -> y -> x + separator + y);
     }
 
     public static void main(String[] args) {
