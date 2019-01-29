@@ -2,7 +2,7 @@ package example.com.alfred.yuan;
 
 import com.alfred.yuan.corecursive.TailCall;
 import com.alfred.yuan.function.Function;
-import com.alfred.yuan.function.base.Tuple;
+import com.alfred.yuan.base.Tuple;
 
 import java.math.BigInteger;
 import java.util.List;

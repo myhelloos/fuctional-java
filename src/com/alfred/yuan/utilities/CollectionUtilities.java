@@ -2,7 +2,7 @@ package com.alfred.yuan.utilities;
 
 import com.alfred.yuan.corecursive.TailCall;
 import com.alfred.yuan.function.Function;
-import com.alfred.yuan.function.base.Effect;
+import com.alfred.yuan.base.Effect;
 
 import java.util.ArrayList;
 import java.util.Arrays;

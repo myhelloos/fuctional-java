@@ -1,4 +1,4 @@
-package com.alfred.yuan.function.base;
+package com.alfred.yuan.base;
 
 /**
  * Created by alfred_yuan on 2019-01-27

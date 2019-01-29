@@ -1,8 +1,8 @@
 package com.alfred.yuan;
 
 import com.alfred.yuan.function.Function;
-import com.alfred.yuan.function.base.Effect;
-import com.alfred.yuan.function.base.Executable;
+import com.alfred.yuan.base.Effect;
+import com.alfred.yuan.base.Executable;
 
 import java.util.List;
 

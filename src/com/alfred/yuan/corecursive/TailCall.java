@@ -1,6 +1,6 @@
 package com.alfred.yuan.corecursive;
 
-import com.alfred.yuan.function.base.Supplier;
+import com.alfred.yuan.base.Supplier;
 
 /**
  * Created by alfred_yuan on 2019-01-28
