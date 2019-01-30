@@ -7,6 +7,61 @@ import com.alfred.yuan.function.Function;
  * Created by alfred_yuan on 2019-01-29
  */
 public abstract class List<E> {
+    @SuppressWarnings(value = "unchecked")
+    public static final List NIL = new Nil();
+
+    @SuppressWarnings(value = "rawtypes")
+    public static <E> List<E> list() {
+        return NIL;
+    }
+
+    @SafeVarargs
+    public static <E> List<E> list(E... es) {
+        List<E> list = list();
+        for (int i = es.length - 1; i >= 0; --i) {
+            list = new Cons<>(es[i], list);
+        }
+        return list;
+    }
+
+    public static <E> List<E> setHead(List<E> list, E head) {
+        return list.setHead(head);
+    }
+
+    public static <E> List<E> drop(List<E> list, int n) {
+        return list.drop(n);
+    }
+
+    public static <E> List<E> dropWhile(List<E> list, Function<E, Boolean> predictor) {
+        return list.dropWhile(predictor);
+    }
+
+    public static <E> List<E> concat(List<E> first, List<E> second) {
+        return first.foldRight(second, head -> list -> list.cons(head));
+    }
+
+    public static <E, U> U foldRight(List<E> list, U identity, Function<E, Function<U, U>> operator) {
+        return list.foldRight(identity, operator);
+    }
+
+    public static <E> List<E> reverse(List<E> list) {
+        return list.reverse();
+    }
+
+    public static <E> List<E> flatten(List<List<E>> lists) {
+        return lists.flatMap(Function.identity());
+    }
+
+    public static <E> Option<List<E>> sequence(List<Option<E>> list) {
+        return traverse(list, Function.identity());
+    }
+
+    public static <E, U> Option<List<U>> traverse(List<E> list, Function<E, Option<U>> function) {
+        return list.foldRight(
+            Option.some(list())
+            , e -> result -> Option.map2(function.apply(e), result, a -> b -> b.cons(a)));
+    }
+
     /**
      * get head of list
      *
@@ -128,51 +183,6 @@ public abstract class List<E> {
     public abstract <U> List<U> flatMap(Function<E, List<U>> operation);
 
     private List() {
-    }
-
-    @SuppressWarnings(value = "unchecked")
-    public static final List NIL = new Nil();
-
-    @SuppressWarnings(value = "rawtypes")
-    public static <E> List<E> list() {
-        return NIL;
-    }
-
-    @SafeVarargs
-    public static <E> List<E> list(E... es) {
-        List<E> list = list();
-        for (int i = es.length - 1; i >= 0; --i) {
-            list = new Cons<>(es[i], list);
-        }
-        return list;
-    }
-
-    public static <E> List<E> setHead(List<E> list, E head) {
-        return list.setHead(head);
-    }
-
-    public static <E> List<E> drop(List<E> list, int n) {
-        return list.drop(n);
-    }
-
-    public static <E> List<E> dropWhile(List<E> list, Function<E, Boolean> predictor) {
-        return list.dropWhile(predictor);
-    }
-
-    public static <E> List<E> concat(List<E> first, List<E> second) {
-        return first.foldRight(second, head -> list -> list.cons(head));
-    }
-
-    public static <E, U> U foldRight(List<E> list, U identity, Function<E, Function<U, U>> operator) {
-        return list.foldRight(identity, operator);
-    }
-
-    public static <E> List<E> reverse(List<E> list) {
-        return list.reverse();
-    }
-
-    public static <E> List<E> flatten(List<List<E>> lists) {
-        return lists.flatMap(Function.identity());
     }
 
     private static class Nil<E> extends List<E> {
