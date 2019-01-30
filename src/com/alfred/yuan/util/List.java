@@ -1,4 +1,4 @@
-package com.alfred.yuan.base;
+package com.alfred.yuan.util;
 
 import com.alfred.yuan.corecursive.TailCall;
 import com.alfred.yuan.function.Function;

@@ -1,7 +1,7 @@
 package com.alfred.yuan;
 
 import com.alfred.yuan.function.Function;
-import com.alfred.yuan.base.Case;
+import com.alfred.yuan.util.Case;
 import com.alfred.yuan.base.Effect;
 import com.alfred.yuan.base.Result;
 

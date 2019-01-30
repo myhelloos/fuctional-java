@@ -1,6 +1,6 @@
 package example.com.alfred.yuan;
 
-import com.alfred.yuan.base.Tuple;
+import com.alfred.yuan.util.Tuple;
 import com.alfred.yuan.corecursive.TailCall;
 import com.alfred.yuan.function.Function;
 

@@ -1,10 +1,10 @@
 package example.com.alfred.yuan;
 
-import com.alfred.yuan.base.List;
+import com.alfred.yuan.util.List;
 import com.alfred.yuan.function.Function;
 
-import static com.alfred.yuan.base.List.foldRight;
-import static com.alfred.yuan.base.List.list;
+import static com.alfred.yuan.util.List.foldRight;
+import static com.alfred.yuan.util.List.list;
 
 /**
  * Created by alfred_yuan on 2019-01-29

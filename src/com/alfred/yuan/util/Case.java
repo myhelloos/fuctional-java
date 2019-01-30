@@ -1,4 +1,7 @@
-package com.alfred.yuan.base;
+package com.alfred.yuan.util;
+
+import com.alfred.yuan.base.Result;
+import com.alfred.yuan.base.Supplier;
 
 /**
  * Created by alfred_yuan on 2019-01-27
