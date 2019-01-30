@@ -91,6 +91,42 @@ public abstract class List<E> {
      */
     public abstract <U> U foldLeft(U identity, Function<U, Function<E, U>> operation);
 
+    /**
+     * fold from the right side
+     *
+     * @param identity  the default result
+     * @param operation operation applied to get the final result
+     * @param <U>       the result type
+     * @return the final result
+     */
+    public abstract <U> U foldRight(U identity, Function<E, Function<U, U>> operation);
+
+    /**
+     * modify each element of a list by applying a specified function to it
+     *
+     * @param operation operation applied on E to get U
+     * @param <U>       the result type
+     * @return the same size list of type U
+     */
+    public abstract <U> List<U> map(Function<E, U> operation);
+
+    /**
+     * removes from a list the elements that don’t satisfy a given predicate
+     *
+     * @param predictor predictor applied to test on each element
+     * @return the list all satisfy the predictor
+     */
+    public abstract List<E> filter(Function<E, Boolean> predictor);
+
+    /**
+     * applies to each element of List<E> a function from A to List<U>, and returns a List<U>.
+     *
+     * @param operation convert E to List<U>
+     * @param <U>       the result type
+     * @return a List<U>
+     */
+    public abstract <U> List<U> flatMap(Function<E, List<U>> operation);
+
     private List() {
     }
 
@@ -124,23 +160,19 @@ public abstract class List<E> {
     }
 
     public static <E> List<E> concat(List<E> first, List<E> second) {
-        return first.isEmpty()
-            ? second
-            : new Cons<>(first.head(), concat(first.tail(), second));
+        return first.foldRight(second, head -> list -> list.cons(head));
     }
 
     public static <E, U> U foldRight(List<E> list, U identity, Function<E, Function<U, U>> operator) {
-        return list.isEmpty()
-            ? identity
-            : operator.apply(list.head()).apply(foldRight(list.tail(), identity, operator));
-    }
-
-    public static <E, U> U foldRightViaFlodLeft(List<E> list, U identity, Function<E, Function<U, U>> operator) {
-        return list.reverse().foldLeft(identity, x -> y -> operator.apply(y).apply(x));
+        return list.foldRight(identity, operator);
     }
 
     public static <E> List<E> reverse(List<E> list) {
-        return list.foldLeft(list(), acc -> acc::cons);
+        return list.reverse();
+    }
+
+    public static <E> List<E> flatten(List<List<E>> lists) {
+        return lists.flatMap(Function.identity());
     }
 
     private static class Nil<E> extends List<E> {
@@ -198,6 +230,26 @@ public abstract class List<E> {
         @Override
         public <U> U foldLeft(U identity, Function<U, Function<E, U>> operation) {
             return identity;
+        }
+
+        @Override
+        public <U> U foldRight(U identity, Function<E, Function<U, U>> operation) {
+            return identity;
+        }
+
+        @Override
+        public <U> List<U> map(Function<E, U> operation) {
+            return list();
+        }
+
+        @Override
+        public List<E> filter(Function<E, Boolean> predictor) {
+            return this;
+        }
+
+        @Override
+        public <U> List<U> flatMap(Function<E, List<U>> operation) {
+            return list();
         }
 
         @Override
@@ -274,6 +326,26 @@ public abstract class List<E> {
         }
 
         @Override
+        public <U> U foldRight(U identity, Function<E, Function<U, U>> operation) {
+            return foldRight_(identity, this.reverse(), operation).eval();
+        }
+
+        @Override
+        public <U> List<U> map(Function<E, U> operation) {
+            return foldRight(list(), e -> acc -> acc.cons(operation.apply(e)));
+        }
+
+        @Override
+        public List<E> filter(Function<E, Boolean> predictor) {
+            return foldRight(list(), e -> acc -> predictor.apply(e) ? acc.cons(e) : acc);
+        }
+
+        @Override
+        public <U> List<U> flatMap(Function<E, List<U>> operation) {
+            return foldRight(list(), e -> acc -> concat(operation.apply(e), acc));
+        }
+
+        @Override
         public String toString() {
             return String.format(
                 "[%sNIL]"
@@ -295,7 +367,7 @@ public abstract class List<E> {
         private TailCall<List<E>> reverse_(List<E> acc, List<E> list) {
             return list.isEmpty()
                 ? TailCall.ret(acc)
-                : TailCall.sus(() -> reverse_(new Cons<>(list.head(), acc), list.tail()));
+                : TailCall.sus(() -> reverse_(acc.cons(list.head()), list.tail()));
         }
 
         private <U> TailCall<U> foldLeft_(U acc, List<E> list, Function<U, Function<E, U>> operation) {
@@ -303,6 +375,15 @@ public abstract class List<E> {
                 ? TailCall.ret(acc)
                 : TailCall.sus(() -> foldLeft_(
                     operation.apply(acc).apply(list.head())
+                    , list.tail()
+                    , operation));
+        }
+
+        private <U> TailCall<U> foldRight_(U acc, List<E> list, Function<E, Function<U, U>> operation) {
+            return list.isEmpty()
+                ? TailCall.ret(acc)
+                : TailCall.sus(() -> foldRight_(
+                    operation.apply(list.head()).apply(acc)
                     , list.tail()
                     , operation));
         }
